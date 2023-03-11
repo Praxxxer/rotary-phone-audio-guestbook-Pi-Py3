@@ -4,12 +4,16 @@ import audioInterface
 import os
 import yaml
 import sys
+import pygame
 
 from datetime import datetime
 from gpiozero import Button
 from signal import pause
 from pydub import AudioSegment
 from pydub.playback import play
+
+dir = '/home/pi/recordings/'
+recordings = ['*.wav']
 
 try:
     with open("config.yaml") as f:
@@ -21,6 +25,7 @@ except FileNotFoundError as e:
     sys.exit(1)
 
 hook = Button(config["hook_gpio"])
+back_button = Button(config["button_gpio"])
 
 
 def off_hook() -> None:
@@ -62,12 +67,24 @@ def off_hook() -> None:
 def on_hook() -> None:
     print("Phone on hook.\nSleeping...")
 
+def playback():
+    # pygame setup
+    pygame.mixier.init()
+    speaker_volume = 0.5 # 50% Volume
+    pygame.mixer.music.set_volume(speaker_volume)
+
+    for recording in recordings:
+        pygame.mixer.music.load(os.path.dirname(os.path.abspath(config["source_file"]))
+        + "/recordings/" + recording)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy() == True:
+            continue
 
 def main():
     hook.when_pressed = off_hook
     hook.when_released = on_hook
+    back_button.when_pressed = playback
     pause()
-
 
 if __name__ == "__main__":
     main()
