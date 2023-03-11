@@ -3,6 +3,7 @@ beep_reduction: 24
 buffer_size: 4096
 channels: 2
 hook_gpio: 22
+button_gpio: 17
 playback_reduction: 16
 recording_limit: 60
 rotary_gpio: 23
